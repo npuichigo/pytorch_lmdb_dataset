@@ -32,9 +32,9 @@ class LmdbDatasetTest(unittest.TestCase):
                                      num_workers=4)
 
     def testRead(self):
-        for data in self.dataloader:
+        for i, data in enumerate(self.dataloader):
             img, label = data
-            print(img.shape, label.shape)
+            print(i, img.shape, label.shape)
 
 if __name__ == '__main__':
     unittest.main()
