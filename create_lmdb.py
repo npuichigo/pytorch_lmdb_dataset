@@ -20,9 +20,10 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import argparse
+import lmdb
 import numpy as np
 
-import lmdb
+from proto import utils
 from proto import tensor_pb2
 
 
@@ -36,25 +37,18 @@ def create_db(output_file):
     with env.begin(write=True) as txn:
         for j in range(0, 1024):
             # MODIFY: add your own data reader / creator
-            label = j % 10
             width = 64
             height = 32
-
-            img_data = np.random.rand(3, width, height)
-            # ...
+            img_data = np.random.rand(3, width, height).astype(np.float32)
+            label = np.asarray(j % 10)
 
             # Create TensorProtos
             tensor_protos = tensor_pb2.TensorProtos()
-            img_tensor = tensor_protos.protos.add()
-            img_tensor.dims.extend(img_data.shape)
-            img_tensor.data_type = 1
+            img_tensor = utils.numpy_array_to_tensor(img_data)
+            tensor_protos.protos.extend([img_tensor])
 
-            flatten_img = img_data.reshape(np.prod(img_data.shape))
-            img_tensor.float_data.extend(flatten_img)
-
-            label_tensor = tensor_protos.protos.add()
-            label_tensor.data_type = 2
-            label_tensor.int32_data.append(label)
+            label_tensor = utils.numpy_array_to_tensor(label)
+            tensor_protos.protos.extend([label_tensor])
             txn.put(
                 '{}'.format(j).encode('ascii'),
                 tensor_protos.SerializeToString()

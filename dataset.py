@@ -22,16 +22,7 @@ import numpy as np
 from torch.utils.data import Dataset
 
 from proto import tensor_pb2
-
-
-def _parse_tensor_proto(tensor_proto):
-    if tensor_proto.data_type == tensor_pb2.TensorProto.FLOAT:
-        tensor = np.array(tensor_proto.float_data)
-    elif tensor_proto.data_type == tensor_pb2.TensorProto.INT32:
-        tensor = np.array(tensor_proto.int32_data)
-    else:
-        raise ValueError("Only float and int32 data are supported now")
-    return tensor.reshape(tensor_proto.dims)
+from proto import utils
 
 
 class LmdbDataset(Dataset):
@@ -51,8 +42,8 @@ class LmdbDataset(Dataset):
             serialized_str = txn.get(self.keys[index])
         tensor_protos = tensor_pb2.TensorProtos()
         tensor_protos.ParseFromString(serialized_str)
-        img = _parse_tensor_proto(tensor_protos.protos[0])
-        label = _parse_tensor_proto(tensor_protos.protos[1])
+        img = utils.tensor_to_numpy_array(tensor_protos.protos[0])
+        label = utils.tensor_to_numpy_array(tensor_protos.protos[1])
         return img, label
 
     def __len__(self):
