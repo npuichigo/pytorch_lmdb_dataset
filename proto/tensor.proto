@@ -5,20 +5,6 @@ message TensorProtos {
   repeated TensorProto protos = 1;
 }
 
-message Tensor {
-  repeated int64 dims = 1;
-  enum DataType {
-    UNDEFINED = 0;
-    FLOAT = 1;  // float
-    INT32 = 2;  // int
-  }
-  DataType data_type = 2;
-  // For float
-  repeated float float_data = 3;
-  // For int32, int8, int16
-  repeated sint32 int32_data = 4;
-}
-
 // TensorProto stores serialized Tensor objects.
 message TensorProto {
   // The dimensions in the tensor.
